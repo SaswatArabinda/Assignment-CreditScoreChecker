@@ -1,30 +1,32 @@
 import React from 'react';
 import { SingleSourceResult } from './singleSourceResult';
-import { data } from '../data/index';
+import { store } from '../store';
+import { getSingleScore } from '../actions';
 
 
 export class SingleSourceMain extends React.Component {
     constructor(props) {
         super(props)
         this.handleClick = this.handleClick.bind(this);
-        this.state = {
-            score: 0,
-            noResult: false
-        }
     }
     handleClick = (event) => {
-        let aadharNo = document.getElementById('aadharInput').value;
-        let phone = document.getElementById('phoneNumberInput').value;
+        const { mappedData } = store.getState();
+        const aadharNo = document.getElementById('aadharInput').value;
+        const phone = document.getElementById('phoneNumberInput').value;
         if (!phone && !aadharNo) {
             return false;
         }
-        let result = data.filter(entry => entry.aadharNo === aadharNo || entry.phone === phone ? entry : '');
 
-        this.setState({ 'noResult': result.length ? false : true });
-        this.setState({ score: (result && result[0] && result[0].score) ? result[0].score : 0 })
+        let result = mappedData.has(aadharNo) ? mappedData.get(aadharNo) : '';
+        result = !result && mappedData.has(phone) ? mappedData.get(phone) : result;
+
+        store.dispatch(getSingleScore({
+            score: (result) ? result : 0,
+            noResult: result ? false : true
+        }))
     }
     render() {
-        let { score, noResult } = this.state;
+        let { score, noResult } = store.getState().singleSrcStore;
 
         return (
             <div id="main" className="col-md-9 col-sm-9">

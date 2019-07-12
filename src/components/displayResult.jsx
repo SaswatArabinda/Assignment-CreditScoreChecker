@@ -1,16 +1,8 @@
 import React from 'react';
-import { data } from '../data/index';
 
 export const DisplayResult = (props) => {
-    let mappedData = new Map();
-    data.forEach((ele, i) => {
-        if (ele.aadharNo) {
-            mappedData.set(ele.aadharNo, ele.score);
-        }
-        if (ele.phone) {
-            mappedData.set(ele.phone, ele.score);
-        }
-    });
+    const { mappedData } = props;
+    const { rows } = props.batchReqStore;
     return (
         <table class="table table-striped">
             <thead>
@@ -22,7 +14,7 @@ export const DisplayResult = (props) => {
                 </tr>
             </thead>
             <tbody>
-                {props.rows.map((ele, i) => {
+                {rows.map((ele, i) => {
                     if (i > 1) {
                         if (ele[0] && mappedData.has(`${ele[0]}`)) {
                             return (<tr><th scope="row">{i - 1}</th><td>{ele[0] ? ele[0] : 'NA'}</td><td>{ele[1] ? ele[1] : 'NA'}</td><td>{mappedData.get(`${ele[0]}`)}</td></tr>)
@@ -34,7 +26,6 @@ export const DisplayResult = (props) => {
                         }
                     }
                     return false
-
                 })}
             </tbody>
         </table>

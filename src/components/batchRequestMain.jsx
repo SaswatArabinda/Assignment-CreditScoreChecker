@@ -1,6 +1,8 @@
 import React from 'react';
 import { ExcelRenderer } from 'react-excel-renderer';
 import { DisplayResult } from './displayResult';
+import { store } from '../store';
+import { getBatchScores, updatePlaceHolder } from '../actions';
 
 export class BatchRequestMain extends React.Component {
     constructor(props) {
@@ -8,11 +10,11 @@ export class BatchRequestMain extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFileSelection = this.onFileSelection.bind(this);
         this.fileInput = React.createRef();
-        this.state = {
-            selectedFile: "Choose a file",
-            cols: [],
-            rows: []
-        }
+        // this.state = {
+        //     selectedFile: "Choose a file",
+        //     cols: [],
+        //     rows: []
+        // }
     }
     handleSubmit(event) {
     }
@@ -20,10 +22,12 @@ export class BatchRequestMain extends React.Component {
     onFileSelection(event) {
         let fileInput = event.target;
         let fileName = fileInput.value.split("\\").pop();
-        this.setState({
+        // this.setState({
+        //     selectedFile: fileName
+        // });
+        store.dispatch(updatePlaceHolder({
             selectedFile: fileName
-        });
-
+        }))
 
         let fileObj = this.fileInput.current.files[0];
         //just pass the fileObj as parameter
@@ -32,16 +36,18 @@ export class BatchRequestMain extends React.Component {
                 console.log(err);
             }
             else {
-                this.setState({
+                store.dispatch(getBatchScores({
                     cols: resp.cols,
                     rows: resp.rows
-                });
+                }))
             }
         });
+
+
     }
 
     render() {
-        let { selectedFile, rows } = this.state;
+        let { selectedFile, rows } = store.getState().batchReqStore;
         return (
             <div id="main" className="col-md-9 col-sm-9">
                 <h2>Welcome to batch request page.</h2>
@@ -55,7 +61,7 @@ export class BatchRequestMain extends React.Component {
                     </div>
                 </div>
 
-                {rows && rows.length > 1 && <DisplayResult {...this.state} />}
+                {rows && rows.length > 1 && <DisplayResult {...store.getState()} />}
             </div>
         )
     }
